@@ -2,7 +2,7 @@ from fastapi import FastAPI
 
 app = FastAPI(title="Shipboard")
 
-projects = [{"id": 1, "title": "Learn Python", "status": "Ongoing"}]
+projects = [{"id": 1, "name": "Learn Python", "status": "ongoing"}]
 
 @app.get("/")
 def home():
@@ -16,4 +16,6 @@ def about():
 
 @app.get("/projects")
 def get_projects():
-    return projects
+    count = len(projects)
+    return {"projects": projects,
+            "count": count}

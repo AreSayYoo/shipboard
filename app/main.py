@@ -8,6 +8,10 @@ class Project(BaseModel):
     name: str
     status: str
 
+class ProjectCreate(BaseModel):
+    name: str
+    status: str
+
 projects = [
     Project(id= 1, name= "Learn Python", status= "ongoing"),
 ]
@@ -34,3 +38,14 @@ def get_project_id(project_id: int) -> Project:
         if project.id == project_id:
             return project
     raise HTTPException(status_code=404, detail="Project not found")
+
+@app.post("/projects")
+def add_project(project_data: ProjectCreate):
+    next_id = len(projects) + 1
+    project = Project(
+        id=next_id,
+        name=project_data.name,
+        status=project_data.status
+    )
+    projects.append(project)
+    return

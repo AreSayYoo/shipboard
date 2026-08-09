@@ -10,7 +10,10 @@ def test_home_page():
 def test_get_projects():
     response = client.get("/projects")
     assert response.status_code == 200
-    assert "projects","count" in response
+
+    data = response.json()
+    assert "projects" in data
+    assert "count" in data
 
 def test_get_project_1():
     response = client.get("/projects/1")

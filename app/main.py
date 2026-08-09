@@ -1,26 +1,7 @@
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
+from app.models import Project, ProjectCreate, Task, TaskCreate
 
 app = FastAPI(title="Shipboard")
-
-class Project(BaseModel):
-    id: int
-    name: str
-    status: str
-
-class ProjectCreate(BaseModel):
-    name: str
-    status: str
-
-class Task(BaseModel):
-    id: int
-    project_id: int
-    title: str
-    completed: bool
-
-class TaskCreate(BaseModel):
-    title: str
-    completed: bool = False
 
 projects = [
     Project(id= 1, name= "Learn Python", status= "ongoing"),

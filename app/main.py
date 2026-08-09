@@ -18,6 +18,10 @@ class Task(BaseModel):
     title: str
     completed: bool
 
+class TaskCreate(BaseModel):
+    title: str
+    completed: bool = False
+
 projects = [
     Project(id= 1, name= "Learn Python", status= "ongoing"),
 ]
@@ -55,8 +59,10 @@ def get_tasks_for_project(project_id: int):
     for task in tasks:
         if task.project_id == project_id:
             project_tasks.append(task)
-    return{"tasks":project_tasks,
-           "count": len(project_tasks)}
+    return{
+        "tasks":project_tasks,
+        "count": len(project_tasks),
+        }
 
 @app.post("/projects")
 def add_project(project_data: ProjectCreate):
@@ -68,3 +74,37 @@ def add_project(project_data: ProjectCreate):
     )
     projects.append(project)
     return project
+
+@app.post("/projects/{project_id}/tasks")
+def add_task(project_id: int, task_data: TaskCreate) -> Task:
+    for project in projects:
+        if project.id == project_id:
+            next_id = len(tasks) + 1
+            task = Task(
+                id=next_id,
+                project_id=project_id,
+                title=task_data.title,
+                completed=task_data.completed
+            )
+            tasks.append(task)
+            return task
+    raise HTTPException(status_code=404, detail="Project does not exist.")
+
+@app.patch("/tasks/{task_id}/complete")
+def complete_task(task_id: int) -> Task:
+    for task in tasks:
+        if task.id == task_id:
+            task.completed = True
+            return task
+    raise HTTPException(status_code=404,detail="Task not found.")
+
+@app.delete("/tasks/{task_id}")
+def delete_task(task_id: int):
+    for i, task in enumerate(tasks):
+        if task.id == task_id:
+            deleted_task = tasks.pop(i)
+            return{
+                "message": "Task deleted.",
+                "task": deleted_task,
+            }
+    raise HTTPException(status_code=404,detail="Task not found.")

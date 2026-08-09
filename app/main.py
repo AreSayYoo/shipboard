@@ -12,8 +12,18 @@ class ProjectCreate(BaseModel):
     name: str
     status: str
 
+class Task(BaseModel):
+    id: int
+    project_id: int
+    title: str
+    completed: bool
+
 projects = [
     Project(id= 1, name= "Learn Python", status= "ongoing"),
+]
+
+tasks = [
+    Task(id=1, project_id=1, title="Download Python", completed=True)
 ]
 
 @app.get("/")
@@ -39,6 +49,15 @@ def get_project_id(project_id: int) -> Project:
             return project
     raise HTTPException(status_code=404, detail="Project not found")
 
+@app.get("/projects/{project_id}/tasks")
+def get_tasks_for_project(project_id: int):
+    project_tasks = []
+    for task in tasks:
+        if task.project_id == project_id:
+            project_tasks.append(task)
+    return{"tasks":project_tasks,
+           "count": len(project_tasks)}
+
 @app.post("/projects")
 def add_project(project_data: ProjectCreate):
     next_id = len(projects) + 1
@@ -48,4 +67,4 @@ def add_project(project_data: ProjectCreate):
         status=project_data.status
     )
     projects.append(project)
-    return
+    return project

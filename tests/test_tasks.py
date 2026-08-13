@@ -37,7 +37,26 @@ def test_complete_task():
 
     response = client.patch(f"/tasks/{task_id}/complete")
     assert response.status_code == 200
-    data = response.json()
 
+    data = response.json()
     assert data["id"] == task_id
     assert data["completed"] is True
+
+def test_delete_task():
+    create_response = client.post(
+        "/projects/1/tasks",
+        json={"title": "Delete me!!"},
+    )
+
+    created_task = create_response.json()
+    task_id = created_task["id"]
+
+    response = client.delete(f"/tasks/{task_id}")
+    assert response.status_code == 200
+
+    data = response.json()
+    assert data["message"] == "Task deleted."
+    assert data["task"]["id"] == task_id
+
+    delete_response_again = client.delete(f"/tasks/{task_id}")
+    assert delete_response_again.status_code == 404

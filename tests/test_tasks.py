@@ -60,3 +60,14 @@ def test_delete_task():
 
     delete_response_again = client.delete(f"/tasks/{task_id}")
     assert delete_response_again.status_code == 404
+
+def test_create_invalid_task():
+    create_response = client.post(
+        "/projects/999/tasks",
+        json={"title": "This should not work..."}
+    )
+
+    assert create_response.status_code == 404
+
+    data = create_response.json()
+    assert data["detail"] == "Project does not exist."

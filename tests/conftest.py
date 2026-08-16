@@ -5,7 +5,6 @@ from app.models import Project, Task
 
 @pytest.fixture(autouse=True)
 def reset_data():
-    print("resetting test data")
     projects.clear()
     tasks.clear()
 

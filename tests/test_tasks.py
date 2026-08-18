@@ -70,4 +70,4 @@ def test_create_invalid_task():
     assert create_response.status_code == 404
 
     data = create_response.json()
-    assert data["detail"] == "Project does not exist."
+    assert data["detail"] == "Project not found"

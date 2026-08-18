@@ -1,6 +1,7 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from app.models import Project, ProjectCreate, Task, TaskCreate
 from app.data import projects, tasks
+from app.services import find_project, find_task, get_task_index
 
 app = FastAPI(title="Shipboard")
 
@@ -22,10 +23,7 @@ def get_projects():
 
 @app.get("/projects/{project_id}")
 def get_project_id(project_id: int) -> Project:
-    for project in projects:
-        if project.id == project_id:
-            return project
-    raise HTTPException(status_code=404, detail="Project not found")
+    return find_project(project_id)
 
 @app.get("/projects/{project_id}/tasks")
 def get_tasks_for_project(project_id: int):
@@ -51,34 +49,29 @@ def add_project(project_data: ProjectCreate):
 
 @app.post("/projects/{project_id}/tasks")
 def add_task(project_id: int, task_data: TaskCreate) -> Task:
-    for project in projects:
-        if project.id == project_id:
-            next_id = len(tasks) + 1
-            task = Task(
-                id=next_id,
-                project_id=project_id,
-                title=task_data.title,
-                completed=task_data.completed
-            )
-            tasks.append(task)
-            return task
-    raise HTTPException(status_code=404, detail="Project does not exist.")
+    project = find_project(project_id)
+    next_id = len(tasks) + 1
+    task = Task(
+        id=next_id,
+        project_id=project.id,
+        title=task_data.title,
+        completed=task_data.completed
+    )
+    tasks.append(task)
+    return task
+
 
 @app.patch("/tasks/{task_id}/complete")
 def complete_task(task_id: int) -> Task:
-    for task in tasks:
-        if task.id == task_id:
-            task.completed = True
-            return task
-    raise HTTPException(status_code=404,detail="Task not found.")
+    task = find_task(task_id)
+    task.completed = True
+    return task
 
 @app.delete("/tasks/{task_id}")
 def delete_task(task_id: int):
-    for i, task in enumerate(tasks):
-        if task.id == task_id:
-            deleted_task = tasks.pop(i)
-            return{
-                "message": "Task deleted.",
-                "task": deleted_task,
-            }
-    raise HTTPException(status_code=404,detail="Task not found.")
+    task_index = get_task_index(task_id)
+    deleted_task = tasks.pop(task_index)
+    return{
+        "message": "Task deleted.",
+        "task": deleted_task,
+    }

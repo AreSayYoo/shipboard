@@ -36,6 +36,30 @@ def get_tasks_for_project(project_id: int):
         "count": len(project_tasks),
         }
 
+@app.get("/projects/{project_id}/progress")
+def get_project_progress(project_id: int):
+    find_project(project_id)
+    completed_tasks = 0
+    project_tasks = [task for task in tasks if task.project_id == project_id]
+    for task in project_tasks:
+        if task.completed:
+            completed_tasks += 1
+    total_tasks = len(project_tasks)
+    if total_tasks == 0:
+        return{
+            "project_id": project_id,
+            "total_tasks": total_tasks,
+            "completed_tasks": completed_tasks,
+            "progress_percent": 0,
+        }
+    progress_percent = round((completed_tasks/total_tasks)*100)
+    return{
+        "project_id": project_id,
+        "total_tasks": total_tasks,
+        "completed_tasks": completed_tasks,
+        "progress_percent": progress_percent,
+    }
+
 @app.post("/projects")
 def add_project(project_data: ProjectCreate):
     next_id = len(projects) + 1

@@ -22,3 +22,12 @@ def test_get_project_1():
 def test_get_invalid_project():
     response = client.get("projects/999")
     assert response.status_code == 404
+
+def test_project_progress():
+    client.patch("/tasks/1/complete")
+    response = client.get("/projects/1/progress")
+    data = response.json()
+    assert data["project_id"] == 1
+    assert data["total_tasks"] == 1
+    assert data["completed_tasks"] == 1
+    assert data["progress_percent"] == 100

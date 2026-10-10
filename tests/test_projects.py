@@ -31,3 +31,4 @@ def test_project_progress():
     assert data["total_tasks"] == 1
     assert data["completed_tasks"] == 1
     assert data["progress_percent"] == 100
+

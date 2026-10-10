@@ -60,9 +60,9 @@ def get_project_progress(project_id: int):
         "progress_percent": progress_percent,
     }
 
-@app.post("/projects")
+@app.post("/projects", status_code=201)
 def add_project(project_data: ProjectCreate):
-    next_id = len(projects) + 1
+    next_id = max((project.id for project in projects), default=0) + 1
     project = Project(
         id=next_id,
         name=project_data.name,
@@ -70,6 +70,18 @@ def add_project(project_data: ProjectCreate):
     )
     projects.append(project)
     return project
+
+@app.put("/projects/{project_id}", status_code=200)
+def update_project(project_id: int, project_data: ProjectCreate):
+    project = find_project(project_id)
+    project.name = project_data.name
+    project.status = project_data.status
+    return project
+
+@app.delete("/projects/{project_id}", status_code=204)
+def remove_project(project_id: int):
+    project = find_project(project_id)
+    projects.remove(project)
 
 @app.post("/projects/{project_id}/tasks")
 def add_task(project_id: int, task_data: TaskCreate) -> Task:
